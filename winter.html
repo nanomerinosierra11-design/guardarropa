@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B3A5C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Guardarropa">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<title>Winter · Guardarropa</title>
+<style>
+:root{
+  --base:#F5F2EB; --card:#EAE4D8; --paper:#FCFAF6;
+  --navy:#1B3A5C; --ink:#23252A; --muted:#736F66; --line:#D8D1C2;
+  --accent:#B08A5A;
+  --serif:"Palatino Linotype","Book Antiqua","Iowan Old Style",Palatino,Georgia,"Times New Roman",serif;
+  --sans:"Avenir Next","Segoe UI",Roboto,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--base); color:var(--ink); font-family:var(--sans)}
+a{color:inherit; text-decoration:none}
+
+header{background:var(--navy); color:#fff; padding:calc(13px + env(safe-area-inset-top)) 18px 0; flex:none}
+.masthead{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+.bookbtn{background:none; border:0; padding:0; text-align:left; cursor:pointer; color:#fff; font:inherit; min-width:0}
+.bookbtn .sub{font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.55); white-space:nowrap}
+.bookbtn h1{font-family:var(--serif); font-size:21px; font-weight:600; margin:1px 0 0; white-space:nowrap}
+.bookbtn h1 .caret{font-size:11px; opacity:.6; margin-left:5px; vertical-align:2px}
+.bookbtn .sub2{font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:rgba(255,255,255,.72);
+  margin-top:3px; font-weight:600; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hbtns{display:flex; gap:7px; flex:none}
+.hbtn{background:none; border:1px solid rgba(255,255,255,.32); color:#fff; font:inherit;
+  font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:6px 10px;
+  border-radius:999px; cursor:pointer; transition:.18s; white-space:nowrap; display:inline-block}
+.hbtn:hover{background:rgba(255,255,255,.13)}
+.hbtn[hidden]{display:none}
+
+.sheet{position:fixed; inset:0; z-index:40; background:rgba(27,58,92,.55); display:none; align-items:flex-end; justify-content:center}
+.sheet.open{display:flex}
+.sheetbody{background:var(--base); width:100%; max-width:620px; max-height:88dvh; overflow-y:auto;
+  border-radius:16px 16px 0 0; padding:26px 24px calc(30px + env(safe-area-inset-bottom))}
+@media(min-width:700px){ .sheet{align-items:center} .sheetbody{border-radius:16px} }
+.sheetbody h3{font-family:var(--serif); font-size:24px; margin:6px 0 4px; font-weight:600}
+.kick{font-size:9.5px; letter-spacing:.19em; text-transform:uppercase; color:var(--muted); font-weight:600}
+.blist{list-style:none; margin:10px 0 0; padding:0}
+.brow{display:flex; gap:14px; align-items:center; width:100%; text-align:left; cursor:pointer;
+  border-top:1px solid var(--line); padding:13px 0; font:inherit}
+.brow .sw{display:flex; gap:3px; flex:none}
+.brow .sw i{width:11px; height:11px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.13)}
+.brow strong{display:block; font-family:var(--serif); font-size:17px; font-weight:600}
+.brow small{display:block; font-size:11px; color:var(--muted); margin-top:2px}
+.brow .go{margin-left:auto; color:var(--muted); font-size:16px}
+.brow.cur strong{color:var(--wk,var(--accent))}
+.dirlist{list-style:none; margin:16px 0 0; padding:0}
+.dirlist li{display:flex; gap:14px; padding:12px 0; border-top:1px solid var(--line)}
+.dirlist .num{font-family:var(--serif); font-size:15px; color:var(--wk,var(--accent)); width:22px; flex:none}
+.dirlist strong{display:block; font-size:12px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:4px}
+.dirlist p{margin:0; font-size:14px; line-height:1.5; color:var(--muted)}
+.pal{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+.pal div{width:30px; height:30px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.snote{font-size:13px; line-height:1.5; color:var(--muted); margin:18px 0 0}
+.closebtn{margin-top:24px; width:100%; padding:12px; border-radius:999px; cursor:pointer;
+  background:var(--navy); color:#fff; border:0; font:inherit; font-size:11px; letter-spacing:.14em; text-transform:uppercase}
+
+:focus-visible{outline:2px solid var(--wk,var(--accent)); outline-offset:3px}
+@media(prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+.fade{animation:fade .3s ease both}
+@keyframes fade{from{opacity:0; transform:translateY(7px)} to{opacity:1; transform:none}}
+
+body{height:100dvh; display:flex; flex-direction:column; overflow:hidden; overscroll-behavior:none}
+.weektabs{display:flex; gap:16px; justify-content:space-between; margin-top:13px; overflow-x:auto; scrollbar-width:none}
+.weektabs::-webkit-scrollbar{display:none}
+.weektab{background:none; border:0; padding:0 0 11px; cursor:pointer; white-space:nowrap; font:inherit;
+  font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); position:relative; transition:color .18s}
+.weektab[aria-selected="true"]{color:#fff}
+.weektab[aria-selected="true"]::after{content:""; position:absolute; left:0; right:0; bottom:0; height:2px; background:var(--wk,var(--accent))}
+
+.rail{display:flex; background:var(--card); border-bottom:1px solid var(--line); flex:none}
+.daybtn{flex:1; background:none; border:0; cursor:pointer; font:inherit; padding:9px 2px 8px;
+  display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--muted); position:relative; transition:color .18s}
+.daybtn .d{font-size:10px; letter-spacing:.14em; font-weight:600}
+.daybtn .n{font-family:var(--serif); font-size:17px; line-height:1.05; color:var(--ink); opacity:.55}
+.rail.nodate .daybtn{padding:12px 2px 11px}
+.rail.nodate .daybtn .d{font-size:13px; letter-spacing:.16em; font-family:var(--serif); font-weight:600}
+.daybtn.wknd .d{color:var(--wk,var(--accent))}
+.daybtn[aria-selected="true"]{color:var(--ink)}
+.daybtn[aria-selected="true"] .n{opacity:1}
+.daybtn[aria-selected="true"]::after{content:""; position:absolute; left:16%; right:16%; bottom:0; height:2px; background:var(--wk,var(--accent))}
+.daybtn.is-today{background:var(--paper)}
+.daybtn.is-today .d{color:var(--wk,var(--accent))}
+
+main{flex:1; min-height:0; display:flex; justify-content:center; padding:14px 16px 10px; overflow-y:auto}
+.spread{width:100%; max-width:1020px; min-height:0; display:grid; grid-template-rows:minmax(120px,1fr) auto; gap:14px}
+@media(min-width:820px){ .spread{grid-template-columns:1.02fr 1fr; grid-template-rows:minmax(0,1fr); gap:48px; align-items:center} }
+.figwrap{background:var(--card); border-radius:14px; padding:14px; display:flex; align-items:flex-end; justify-content:center; min-height:0; overflow:hidden}
+.figwrap img{width:auto; max-width:100%; max-height:100%; height:auto; object-fit:contain; display:block; filter:drop-shadow(0 16px 20px rgba(60,50,35,.14))}
+@media(max-width:819px){ .figwrap{max-height:41dvh; background:none; padding:4px 0 0} .pieces li:last-child{border-bottom:0} }
+@media(min-width:820px){ .figwrap{height:100%; padding:20px} }
+.detail{display:flex; flex-direction:column}
+.rule{width:52px; height:3px; background:var(--wk,var(--accent)); margin-bottom:13px}
+.detail .day{font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--wk,var(--accent)); font-weight:700}
+.detail h2{font-family:var(--serif); font-size:clamp(22px,5.4vw,34px); line-height:1.13; font-weight:600; margin:5px 0 0}
+.tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:9px}
+.tag{padding:3px 9px; border-radius:999px; border:1px solid var(--line); background:var(--paper);
+  font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600}
+.pieces{list-style:none; margin:14px 0 0; padding:0; border-top:1px solid var(--line)}
+.pieces li{display:flex; align-items:center; gap:13px; padding:8px 0; border-bottom:1px solid var(--line)}
+@media(min-width:820px){ .pieces li{padding:10px 0} }
+.chip{width:23px; height:23px; border-radius:50%; flex:none; box-shadow:inset 0 0 0 1px rgba(0,0,0,.16), 0 1px 2px rgba(0,0,0,.10)}
+.pieces .lbl{font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:600; width:86px; flex:none}
+.pieces .nm{font-size:14.5px; color:var(--ink)}
+
+.strip{display:flex; gap:6px; justify-content:center; align-items:flex-end; flex:none;
+  max-width:760px; margin:0 auto; width:100%; padding:8px 10px calc(9px + env(safe-area-inset-bottom));
+  background:var(--card); border-top:1px solid var(--line)}
+.thumb{background:none; border:0; padding:4px 2px 6px; cursor:pointer; flex:1; max-width:74px;
+  border-radius:8px; display:flex; flex-direction:column; align-items:center; gap:3px; opacity:.42; transition:opacity .2s, background .2s}
+.thumb img{height:44px; width:auto; max-width:100%; object-fit:contain; display:block}
+.thumb span{font-size:9px; letter-spacing:.12em; font-weight:600; color:var(--muted)}
+.thumb:hover{opacity:.8}
+.thumb[aria-selected="true"]{opacity:1; background:var(--paper)}
+.thumb[aria-selected="true"] span{color:var(--ink)}
+@media(min-width:820px){ .thumb img{height:74px} .thumb{max-width:96px} }
+
+.arrow{position:fixed; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:50%;
+  z-index:18; background:rgba(252,250,246,.88); border:1px solid var(--line); color:var(--navy);
+  font-size:16px; cursor:pointer; display:none; align-items:center; justify-content:center}
+@media(min-width:900px){ .arrow{display:flex} }
+.arrow.prev{left:18px} .arrow.next{right:18px}
+.arrow:hover{background:#fff}
+</style>
+</head><body>
+
+<header id="hdr">
+  <div class="masthead">
+    <button class="bookbtn" id="bookBtn">
+      <span class="sub">Guardarropa</span>
+      <h1>Winter<span class="caret">&#9662;</span></h1>
+      <span class="sub2">The Peacoat Edit</span>
+    </button>
+    <div class="hbtns">
+      <a class="hbtn" href="index.html">Galería</a>
+      <button class="hbtn" id="todayBtn" hidden>Hoy</button>
+    </div>
+  </div>
+  <div class="weektabs" id="weektabs" role="tablist"></div>
+</header>
+
+<nav class="rail" id="rail" role="tablist" aria-label="Días"></nav>
+<main id="stage"></main>
+<div class="strip" id="strip" role="tablist" aria-label="Outfits de la semana"></div>
+
+<button class="arrow prev" id="prev" aria-label="Anterior">&#8249;</button>
+<button class="arrow next" id="next" aria-label="Siguiente">&#8250;</button>
+<div class="sheet" id="sheet"><div class="sheetbody" id="sheetbody"></div></div>
+
+<script>
+const B = {"id":"abr","title":"Winter","subtitle":"The Peacoat Edit","kicker":"Naval gold buttons · camel · burgundy · gray · green","dated":false,"direction":[["Naval Icons","Navy y negro con botones dorados, más azul rey y punto marinero."],["Camel & Burgundy","Tonos cálidos con cashmere, franela, denim y pantalones crema."],["Gray & Green","Charcoal, gris claro, botella y olivo para una semana urbana."],["Winter Statements","Peacoats sobre trajes, cuellos altos, cable knit y capas casuales."]],"note":"28 looks de invierno construidos alrededor del peacoat cruzado en siete colores.","palette":[["#18354F","#18354F"],["#5B6245","#5B6245"],["#276071","#276071"],["#A65F3F","#A65F3F"],["#9A8873","#9A8873"],["#743A42","#743A42"]],"weeks":[{"label":"Sem 01","accent":"#18354F","days":[{"dow":"Lunes","short":"L","weekend":false,"eyebrow":"Navy Gold","title":"Peacoat navy con botones dorados","intent":"Icono naval","items":[{"label":"Abrigo","name":"Peacoat navy con botones dorados","color":"#22304C"},{"label":"Cuello alto","name":"Cuello alto marfil","color":"#F2EDE2"},{"label":"Pantalón","name":"Franela charcoal","color":"#3E4145"},{"label":"Botín","name":"Botín negro","color":"#17171A"}],"kind":"Abrigo","fam":"Azul","img":"f-abr-00.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":6.3},{"dow":"Martes","short":"M","weekend":false,"eyebrow":"Black Gold Formal","title":"Peacoat negro con botones dorados","intent":"Ciudad formal","items":[{"label":"Abrigo","name":"Peacoat negro con botones dorados","color":"#17171A"},{"label":"Camisa","name":"Camisa blanca","color":"#FBFBF8"},{"label":"Corbata","name":"Corbata borgoña","color":"#6B2733"},{"label":"Pantalón","name":"Pantalón negro","color":"#17171A"},{"label":"Zapatos","name":"Oxford","color":"#2A2A2D"}],"kind":"Abrigo","fam":"Negro","img":"f-abr-01.webp","tmin":2,"tmax":12,"rain":"neutro","when":"día","warmth":3.0},{"dow":"Miércoles","short":"X","weekend":false,"eyebrow":"Royal Blue","title":"Peacoat azul rey","intent":"Azul protagonista","items":[{"label":"Abrigo","name":"Peacoat azul rey","color":"#1B44B0"},{"label":"Cuello alto","name":"Cuello alto gris cashmere","color":"#8A8A8C"},{"label":"Pantalón","name":"Pantalón navy","color":"#22304C"},{"label":"Botín","name":"Chelsea negro","color":"#17171A"}],"kind":"Abrigo","fam":"Azul","img":"f-abr-02.webp","tmin":-5,"tmax":8,"rain":"apto","when":"día","warmth":6.3},{"dow":"Jueves","short":"J","weekend":false,"eyebrow":"Navy Banker","title":"Peacoat navy con botones dorados","intent":"Oficina de invierno","items":[{"label":"Abrigo","name":"Peacoat navy con botones dorados","color":"#22304C"},{"label":"Camisa","name":"Camisa azul cielo","color":"#8FB6D8"},{"label":"Corbata","name":"Corbata navy","color":"#22304C"},{"label":"Pantalón","name":"Pantalón gris","color":"#8A8A8C"},{"label":"Zapatos","name":"Oxford","color":"#2A2A2D"}],"kind":"Abrigo","fam":"Azul","img":"f-abr-03.webp","tmin":2,"tmax":12,"rain":"neutro","when":"día","warmth":3.0},{"dow":"Viernes","short":"V","weekend":false,"eyebrow":"Black & Cream","title":"Peacoat negro con botones dorados","intent":"Contraste gráfico","items":[{"label":"Abrigo","name":"Peacoat negro con botones dorados","color":"#17171A"},{"label":"Cuello alto","name":"Cuello alto negro","color":"#17171A"},{"label":"Pantalón","name":"Pantalón crema","color":"#EDE6D6"},{"label":"Loafers","name":"Loafer negro","color":"#17171A"}],"kind":"Abrigo","fam":"Negro","img":"f-abr-04.webp","tmin":-5,"tmax":8,"rain":"evitar","when":"día","warmth":4.5},{"dow":"Sábado","short":"S","weekend":true,"eyebrow":"Naval Breton","title":"Peacoat navy con botones dorados","intent":"Fin de semana naval","items":[{"label":"Abrigo","name":"Peacoat navy con botones dorados","color":"#22304C"},{"label":"Punto","name":"Punto Breton navy/blanco","color":"#22304C"},{"label":"Pantalón","name":"Pantalón blanco","color":"#FBFBF8"},{"label":"Botín","name":"Botín café","color":"#6B4527"}],"kind":"Abrigo","fam":"Azul","img":"f-abr-05.webp","tmin":-5,"tmax":8,"rain":"apto","when":"día","warmth":4.6},{"dow":"Domingo","short":"D","weekend":true,"eyebrow":"Royal Cable Knit","title":"Peacoat azul rey","intent":"Domingo de invierno","items":[{"label":"Abrigo","name":"Peacoat azul rey","color":"#1B44B0"},{"label":"Punto","name":"Cable knit marfil","color":"#F2EDE2"},{"label":"Pantalón","name":"Pantalón charcoal","color":"#3E4145"},{"label":"Botín","name":"Botín café","color":"#6B4527"}],"kind":"Abrigo","fam":"Azul","img":"f-abr-06.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":4.8}]},{"label":"Sem 02","accent":"#A65F3F","days":[{"dow":"Lunes","short":"L","weekend":false,"eyebrow":"Camel Ivory","title":"Peacoat camel cruzado","intent":"Tonal cálido","items":[{"label":"Abrigo","name":"Peacoat camel cruzado","color":"#A67D4E"},{"label":"Cuello alto","name":"Cuello alto marfil","color":"#F2EDE2"},{"label":"Pantalón","name":"Pantalón crema","color":"#EDE6D6"},{"label":"Botín","name":"Botín suede café","color":"#7A5232"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-07.webp","tmin":-5,"tmax":8,"rain":"evitar","when":"día","warmth":5.1},{"dow":"Martes","short":"M","weekend":false,"eyebrow":"Burgundy Business","title":"Peacoat burdeos","intent":"Burdeos ejecutivo","items":[{"label":"Abrigo","name":"Peacoat burdeos","color":"#6B2733"},{"label":"Camisa","name":"Camisa azul cielo","color":"#8FB6D8"},{"label":"Corbata","name":"Corbata navy","color":"#22304C"},{"label":"Pantalón","name":"Pantalón charcoal","color":"#3E4145"},{"label":"Zapatos","name":"Oxford","color":"#2A2A2D"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-08.webp","tmin":2,"tmax":12,"rain":"neutro","when":"día","warmth":3.0},{"dow":"Miércoles","short":"X","weekend":false,"eyebrow":"Camel Denim","title":"Peacoat camel","intent":"Casual premium","items":[{"label":"Abrigo","name":"Peacoat camel","color":"#A67D4E"},{"label":"Punto","name":"Suéter cashmere navy","color":"#22304C"},{"label":"Pantalón","name":"Jeans índigo","color":"#2B3A5C"},{"label":"Botín","name":"Botín café","color":"#6B4527"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-09.webp","tmin":-5,"tmax":8,"rain":"apto","when":"día","warmth":5.8},{"dow":"Jueves","short":"J","weekend":false,"eyebrow":"Wine & Gray","title":"Peacoat vino profundo","intent":"Noche urbana","items":[{"label":"Abrigo","name":"Peacoat vino profundo","color":"#6B2733"},{"label":"Cuello alto","name":"Cuello alto gris","color":"#8A8A8C"},{"label":"Pantalón","name":"Pantalón negro","color":"#17171A"},{"label":"Botín","name":"Chelsea negro","color":"#17171A"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-10.webp","tmin":-5,"tmax":8,"rain":"apto","when":"día","warmth":5.1},{"dow":"Viernes","short":"V","weekend":false,"eyebrow":"Camel Flannel","title":"Peacoat camel","intent":"Heritage cálido","items":[{"label":"Abrigo","name":"Peacoat camel","color":"#A67D4E"},{"label":"Camisa","name":"Camisa blanca","color":"#FBFBF8"},{"label":"Corbata","name":"Corbata verde","color":"#4A5C40"},{"label":"Pantalón","name":"Franela café","color":"#6B4527"},{"label":"Zapatos","name":"Oxford café","color":"#6B4527"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-11.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":4.2},{"dow":"Sábado","short":"S","weekend":true,"eyebrow":"Burgundy Cream","title":"Peacoat burdeos","intent":"Fin de semana","items":[{"label":"Abrigo","name":"Peacoat burdeos","color":"#6B2733"},{"label":"Punto","name":"Cable knit marfil","color":"#F2EDE2"},{"label":"Pantalón","name":"Pantalón crema","color":"#EDE6D6"},{"label":"Botín","name":"Botín café","color":"#6B4527"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-12.webp","tmin":-5,"tmax":8,"rain":"evitar","when":"día","warmth":4.8},{"dow":"Domingo","short":"D","weekend":true,"eyebrow":"Dark Camel","title":"Peacoat camel oscuro","intent":"Domingo relajado","items":[{"label":"Abrigo","name":"Peacoat camel oscuro","color":"#715535"},{"label":"Camisa","name":"Camisa chambray azul","color":"#8FAFC8"},{"label":"Pantalón","name":"Pantalón gris","color":"#8A8A8C"},{"label":"Loafers","name":"Loafer café","color":"#6B4527"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-13.webp","tmin":7,"tmax":16,"rain":"neutro","when":"día","warmth":1.4}]},{"label":"Sem 03","accent":"#276071","days":[{"dow":"Lunes","short":"L","weekend":false,"eyebrow":"Gray & Black","title":"Peacoat gris medio","intent":"Monocromo urbano","items":[{"label":"Abrigo","name":"Peacoat gris medio","color":"#8B8D90"},{"label":"Cuello alto","name":"Cuello alto negro","color":"#17171A"},{"label":"Pantalón","name":"Pantalón charcoal","color":"#3E4145"},{"label":"Botín","name":"Botín negro","color":"#17171A"}],"kind":"Abrigo","fam":"Gris","img":"f-abr-14.webp","tmin":-5,"tmax":8,"rain":"apto","when":"día","warmth":5.1},{"dow":"Martes","short":"M","weekend":false,"eyebrow":"Forest Cashmere","title":"Peacoat verde bosque","intent":"Verde refinado","items":[{"label":"Abrigo","name":"Peacoat verde bosque","color":"#26402F"},{"label":"Punto","name":"Suéter marfil cashmere","color":"#F2EDE2"},{"label":"Pantalón","name":"Franela gris","color":"#8A8A8C"},{"label":"Botín","name":"Botín café","color":"#6B4527"}],"kind":"Abrigo","fam":"Verde","img":"f-abr-15.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":5.8},{"dow":"Miércoles","short":"X","weekend":false,"eyebrow":"Light Gray Suit","title":"Peacoat gris claro","intent":"Sastrería invernal","items":[{"label":"Abrigo","name":"Peacoat gris claro","color":"#B4B5B7"},{"label":"Traje","name":"Traje navy","color":"#22304C"},{"label":"Camisa","name":"Camisa blanca","color":"#FBFBF8"},{"label":"Zapatos","name":"Oxford negro","color":"#17171A"}],"kind":"Traje","fam":"Gris","img":"f-abr-16.webp","tmin":2,"tmax":12,"rain":"neutro","when":"día","warmth":3.4},{"dow":"Jueves","short":"J","weekend":false,"eyebrow":"Bottle Green","title":"Peacoat verde botella","intent":"Color ejecutivo","items":[{"label":"Abrigo","name":"Peacoat verde botella","color":"#20402F"},{"label":"Camisa","name":"Camisa azul cielo","color":"#8FB6D8"},{"label":"Corbata","name":"Corbata borgoña","color":"#6B2733"},{"label":"Pantalón","name":"Pantalón navy","color":"#22304C"}],"kind":"Abrigo","fam":"Verde","img":"f-abr-17.webp","tmin":2,"tmax":12,"rain":"neutro","when":"día","warmth":3.0},{"dow":"Viernes","short":"V","weekend":false,"eyebrow":"Charcoal Cream","title":"Peacoat charcoal","intent":"Contraste de invierno","items":[{"label":"Abrigo","name":"Peacoat charcoal","color":"#3E4145"},{"label":"Cuello alto","name":"Cuello alto crema","color":"#EDE6D6"},{"label":"Pantalón","name":"Pantalón blanco","color":"#FBFBF8"},{"label":"Botín","name":"Chelsea negro","color":"#17171A"}],"kind":"Abrigo","fam":"Gris","img":"f-abr-18.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":5.1},{"dow":"Sábado","short":"S","weekend":true,"eyebrow":"Olive Denim","title":"Peacoat verde olivo","intent":"Casual de campo","items":[{"label":"Abrigo","name":"Peacoat verde olivo","color":"#4A5C40"},{"label":"Punto","name":"Crewneck gris","color":"#8A8A8C"},{"label":"Pantalón","name":"Jeans índigo","color":"#2B3A5C"},{"label":"Botín","name":"Botín suede café","color":"#7A5232"}],"kind":"Abrigo","fam":"Verde","img":"f-abr-19.webp","tmin":-5,"tmax":8,"rain":"apto","when":"día","warmth":3.6},{"dow":"Domingo","short":"D","weekend":true,"eyebrow":"Pale Gray Burgundy","title":"Peacoat gris pálido","intent":"Cierre tonal","items":[{"label":"Abrigo","name":"Peacoat gris pálido","color":"#8A8A8C"},{"label":"Cuello alto","name":"Cuello alto burdeos","color":"#6B2733"},{"label":"Pantalón","name":"Pantalón charcoal","color":"#3E4145"},{"label":"Loafers","name":"Loafer negro","color":"#17171A"}],"kind":"Abrigo","fam":"Gris","img":"f-abr-20.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":4.5}]},{"label":"Sem 04","accent":"#743A42","days":[{"dow":"Lunes","short":"L","weekend":false,"eyebrow":"Navy Three-Piece","title":"Peacoat navy con botones dorados","intent":"Máxima formalidad","items":[{"label":"Abrigo","name":"Peacoat navy con botones dorados","color":"#22304C"},{"label":"Traje","name":"Traje charcoal de tres piezas","color":"#3E4145"},{"label":"Corbata","name":"Corbata borgoña","color":"#6B2733"},{"label":"Zapatos","name":"Oxford","color":"#2A2A2D"}],"kind":"Traje","fam":"Azul","img":"f-abr-21.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":4.0},{"dow":"Martes","short":"M","weekend":false,"eyebrow":"Black Ivory","title":"Peacoat negro con botones dorados","intent":"Lujo discreto","items":[{"label":"Abrigo","name":"Peacoat negro con botones dorados","color":"#17171A"},{"label":"Cuello alto","name":"Cuello alto marfil","color":"#F2EDE2"},{"label":"Pantalón","name":"Pantalón gris","color":"#8A8A8C"},{"label":"Botín","name":"Botín negro","color":"#17171A"}],"kind":"Abrigo","fam":"Negro","img":"f-abr-22.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":5.1},{"dow":"Miércoles","short":"X","weekend":false,"eyebrow":"Camel Green","title":"Peacoat camel","intent":"Paleta ecuestre","items":[{"label":"Abrigo","name":"Peacoat camel","color":"#A67D4E"},{"label":"Punto","name":"Suéter verde botella","color":"#20402F"},{"label":"Pantalón","name":"Pantalón crema","color":"#EDE6D6"},{"label":"Botín","name":"Botín café","color":"#6B4527"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-23.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":4.6},{"dow":"Jueves","short":"J","weekend":false,"eyebrow":"Royal Formal","title":"Peacoat azul rey","intent":"Statement formal","items":[{"label":"Abrigo","name":"Peacoat azul rey","color":"#1B44B0"},{"label":"Camisa","name":"Camisa blanca","color":"#FBFBF8"},{"label":"Corbata","name":"Corbata negra","color":"#17171A"},{"label":"Pantalón","name":"Pantalón negro","color":"#17171A"},{"label":"Zapatos","name":"Oxford","color":"#2A2A2D"}],"kind":"Abrigo","fam":"Azul","img":"f-abr-24.webp","tmin":2,"tmax":12,"rain":"neutro","when":"día","warmth":3.0},{"dow":"Viernes","short":"V","weekend":false,"eyebrow":"Burgundy Navy","title":"Peacoat burdeos","intent":"Cena de invierno","items":[{"label":"Abrigo","name":"Peacoat burdeos","color":"#6B2733"},{"label":"Cuello alto","name":"Cuello alto navy","color":"#22304C"},{"label":"Pantalón","name":"Pantalón gris","color":"#8A8A8C"},{"label":"Loafers","name":"Loafer negro","color":"#17171A"}],"kind":"Abrigo","fam":"Marrón","img":"f-abr-25.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":4.5},{"dow":"Sábado","short":"S","weekend":true,"eyebrow":"Forest Cable Knit","title":"Peacoat verde bosque","intent":"Textura de montaña","items":[{"label":"Abrigo","name":"Peacoat verde bosque","color":"#26402F"},{"label":"Punto","name":"Cable knit marfil","color":"#F2EDE2"},{"label":"Pantalón","name":"Pantalón café","color":"#6B4527"},{"label":"Botín","name":"Botín oscuro","color":"#3A3A3E"}],"kind":"Abrigo","fam":"Verde","img":"f-abr-26.webp","tmin":-5,"tmax":8,"rain":"neutro","when":"día","warmth":4.8},{"dow":"Domingo","short":"D","weekend":true,"eyebrow":"Gray Hoodie","title":"Peacoat gris","intent":"Sport de lujo","items":[{"label":"Abrigo","name":"Peacoat gris","color":"#8A8A8C"},{"label":"Punto","name":"Hoodie cashmere navy","color":"#22304C"},{"label":"Pantalón","name":"Jeans oscuros","color":"#3A3A3E"},{"label":"Tenis","name":"Sneaker blanco","color":"#FBFBF8"}],"kind":"Abrigo","fam":"Gris","img":"f-abr-27.webp","tmin":-5,"tmax":8,"rain":"apto","when":"día","warmth":5.2}]}],"months":[12,1,2],"role":"temporada","file":"winter.html"}, NAV = [{"file":"agosto.html","title":"Agosto 2026","subtitle":"Sastrería italiana","palette":["#1B3A5C","#8A8A8C","#8A6242","#55603F","#D8CDBA","#8E2231"]},{"file":"septiembre.html","title":"Septiembre 2026","subtitle":"Pre-fall en México","palette":["#1B3A5C","#5C6544","#1F6E80","#B4552F","#A08C77","#6B2733"]},{"file":"winter.html","title":"Winter","subtitle":"The Peacoat Edit","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"active.html","title":"Active","subtitle":"Luxury Sportswear","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"autumn.html","title":"Autumn / Winter","subtitle":"Textured Separates","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"bodas.html","title":"Bodas","subtitle":"Tuxedo y traje formal","palette":["#5C6B47","#2B7F95","#C1622F","#9D9483","#12314E","#F2ECE5"]},{"file":"separates.html","title":"Separates","subtitle":"The Sport Coat Edit","palette":["#173A5E","#9D9483","#2B7F95","#7D2F42","#12314E","#F2ECE5"]},{"file":"primavera-verano.html","title":"Spring / Summer","subtitle":"Lightweight Separates","palette":["#173A5E","#9D9483","#2B7F95","#7D2F42","#12314E","#F2ECE5"]},{"file":"octubre.html","title":"Octubre 2026","subtitle":"Pre-fall en México","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"golf.html","title":"Golf","subtitle":"The RLX-Inspired Round","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"aspen.html","title":"Aspen · Vail","subtitle":"A Month in the Snow","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"loropiana.html","title":"Loro Piana","subtitle":"Traveller & Suede Bombers","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"pini-parma.html","title":"Pini Parma","subtitle":"Pre-Fall / Winter 2026","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"playa.html","title":"Playa","subtitle":"Resort y beachwear","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"purple-label.html","title":"Purple Label","subtitle":"Pre-Fall 2026","palette":["#173a5e","#c1622e","#5c6644","#7d2e40","#12314E","#F2ECE5"]},{"file":"safari.html","title":"Safari Capsule","subtitle":"Purple Label · expedition luxury","palette":["#173a5e","#c1622e","#5c6644","#7d2e40","#12314E","#F2ECE5"]},{"file":"yacht.html","title":"Yacht Collection","subtitle":"Purple Label · navy y blanco","palette":["#173a5e","#c1622e","#5c6644","#7d2e40","#12314E","#F2ECE5"]},{"file":"chromatic.html","title":"Chromatic","subtitle":"Colour Tailoring","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"savile-row.html","title":"Savile Row","subtitle":"The Banker's Wardrobe","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"riviera.html","title":"Riviera","subtitle":"Summer Tailoring","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"beach-club.html","title":"Beach Club","subtitle":"Mediterranean Resort","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]}];
+let wi = 0, di = 0;
+const $ = s => document.querySelector(s);
+const rail=$('#rail'), strip=$('#strip'), stage=$('#stage'), tabs=$('#weektabs'), sheet=$('#sheet');
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+let TODAY = null;
+(function(){
+  const iso = new Date().toISOString().slice(0,10);
+  B.weeks.forEach((w,x) => w.days.forEach((d,y) => { if(d.iso === iso) TODAY = [x,y]; }));
+})();
+
+(function(){
+  const m = /^#w(\d+)d(\d+)$/.exec(location.hash);
+  if(m){ wi = Math.min(+m[1], B.weeks.length-1); di = Math.min(+m[2], B.weeks[wi].days.length-1); }
+  else if(TODAY){ wi = TODAY[0]; di = TODAY[1]; }
+})();
+
+function render(animate){
+  const w = B.weeks[wi], d = w.days[di];
+  document.documentElement.style.setProperty('--wk', w.accent);
+
+  tabs.innerHTML = B.weeks.map((x,i) =>
+    '<button class="weektab" role="tab" data-w="'+i+'" aria-selected="'+(i===wi)+'">'+esc(x.label)+'</button>').join('');
+
+  rail.className = 'rail' + (B.dated ? '' : ' nodate');
+  rail.innerHTML = w.days.map((x,i) =>
+    '<button class="daybtn '+(x.weekend?'wknd':'')+' '+((TODAY&&TODAY[0]===wi&&TODAY[1]===i)?'is-today':'')+'"'
+    +' role="tab" data-d="'+i+'" aria-selected="'+(i===di)+'">'
+    +'<span class="d">'+x.short+'</span>'+(B.dated?'<span class="n">'+x.date+'</span>':'')+'</button>').join('');
+
+  strip.innerHTML = w.days.map((x,i) =>
+    '<button class="thumb" role="tab" data-d="'+i+'" aria-selected="'+(i===di)+'" title="'+esc(x.dow+' · '+x.title)+'">'
+    +'<img src="'+x.img+'" alt=""><span>'+x.short+'</span></button>').join('');
+
+  const line = B.dated ? d.dow+' '+d.date+' de '+d.mon+' · '+d.eyebrow
+                       : w.label+' · '+d.dow+' · '+d.eyebrow;
+  const tags = [];
+  if(d.repeat) tags.push('Repetición');
+  if(d.intent) tags.push(d.intent);
+  tags.push(d.kind, d.fam);
+
+  stage.innerHTML = '<div class="spread">'
+    + '<div class="figwrap"><img src="'+d.img+'" alt="'+esc(d.title)+'"></div>'
+    + '<div class="detail"><div class="rule"></div>'
+    + '<div class="day">'+esc(line)+'</div><h2>'+esc(d.title)+'</h2>'
+    + '<div class="tags">'+tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'</div>'
+    + '<ul class="pieces">'
+    + d.items.map(it => '<li><span class="chip" style="background:'+it.color+'"></span>'
+        +'<span class="lbl">'+esc(it.label)+'</span><span class="nm">'+esc(it.name)+'</span></li>').join('')
+    + '</ul></div></div>';
+  if(animate !== false) stage.firstElementChild.classList.add('fade');
+  $('#todayBtn').hidden = !TODAY || (TODAY[0]===wi && TODAY[1]===di);
+  history.replaceState(null, '', '#w'+wi+'d'+di);
+}
+
+function toFlat(){ let n=0; for(let i=0;i<wi;i++) n+=B.weeks[i].days.length; return n+di; }
+function go(step){
+  let t=0; for(const w of B.weeks) t+=w.days.length;
+  let n = Math.max(0, Math.min(t-1, toFlat()+step));
+  for(let w=0;w<B.weeks.length;w++){
+    if(n < B.weeks[w].days.length){ wi=w; di=n; break; }
+    n -= B.weeks[w].days.length;
+  }
+  render();
+}
+tabs.addEventListener('click', e => { const t=e.target.closest('.weektab'); if(!t) return; wi=+t.dataset.w; di=0; render(); });
+rail.addEventListener('click', e => { const t=e.target.closest('.daybtn'); if(!t) return; di=+t.dataset.d; render(); });
+strip.addEventListener('click', e => { const t=e.target.closest('.thumb'); if(!t) return; di=+t.dataset.d; render(); });
+$('#prev').onclick = () => go(-1);
+$('#next').onclick = () => go(1);
+$('#todayBtn').onclick = () => { if(TODAY){ wi=TODAY[0]; di=TODAY[1]; render(); } };
+addEventListener('keydown', e => {
+  if(sheet.classList.contains('open')){ if(e.key==='Escape') sheet.classList.remove('open'); return; }
+  if(e.key==='ArrowRight') go(1);
+  if(e.key==='ArrowLeft') go(-1);
+});
+let x0=null,y0=null;
+stage.addEventListener('touchstart', e => { x0=e.touches[0].clientX; y0=e.touches[0].clientY; }, {passive:true});
+stage.addEventListener('touchend', e => {
+  if(x0===null) return;
+  const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+  if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)) go(dx<0?1:-1);
+  x0=null;
+}, {passive:true});
+
+sheet.addEventListener('click', e => {
+  if(e.target.id==='sheet' || e.target.hasAttribute('data-close')) sheet.classList.remove('open');
+});
+$('#bookBtn').onclick = () => {
+  let h = '<div class="kick">'+esc(B.title)+'</div><h3>'+esc(B.subtitle)+'</h3>'
+        + '<div class="snote" style="margin-top:6px">'+esc(B.kicker)+'</div>';
+  if(B.direction.length)
+    h += '<ul class="dirlist">' + B.direction.map((p,i) =>
+      '<li><span class="num">0'+(i+1)+'</span><div><strong>'+esc(p[0])+'</strong><p>'+esc(p[1])+'</p></div></li>').join('') + '</ul>';
+  h += '<div class="kick" style="margin-top:18px">Paleta</div><div class="pal">'
+     + B.palette.map(c=>'<div style="background:'+c[1]+'"></div>').join('') + '</div>';
+  if(B.note) h += '<p class="snote">'+esc(B.note)+'</p>';
+  h += '<div class="kick" style="margin-top:26px">Booklets</div><ul class="blist">'
+     + NAV.map(x => '<a class="brow '+(x.file===B.file?'cur':'')+'" href="'+x.file+'">'
+        + '<span class="sw">'+x.palette.slice(0,4).map(c=>'<i style="background:'+c+'"></i>').join('')+'</span>'
+        + '<span><strong>'+esc(x.title)+'</strong><small>'+esc(x.subtitle)+'</small></span>'
+        + '<span class="go">&#8250;</span></a>').join('')
+     + '</ul><a class="brow" href="index.html" style="border-bottom:1px solid var(--line)">'
+     + '<span><strong>Galería</strong><small>Los 140 outfits juntos</small></span><span class="go">&#8250;</span></a>';
+  $('#sheetbody').innerHTML = h + '<button class="closebtn" data-close>Cerrar</button>';
+  sheet.classList.add('open');
+};
+addEventListener('hashchange', () => {
+  const m = /^#w(\d+)d(\d+)$/.exec(location.hash);
+  if(m){ wi=+m[1]; di=+m[2]; render(); }
+});
+render(false);
+</script></body></html>

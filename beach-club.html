@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B3A5C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Guardarropa">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<title>Beach Club · Guardarropa</title>
+<style>
+:root{
+  --base:#F5F2EB; --card:#EAE4D8; --paper:#FCFAF6;
+  --navy:#1B3A5C; --ink:#23252A; --muted:#736F66; --line:#D8D1C2;
+  --accent:#B08A5A;
+  --serif:"Palatino Linotype","Book Antiqua","Iowan Old Style",Palatino,Georgia,"Times New Roman",serif;
+  --sans:"Avenir Next","Segoe UI",Roboto,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--base); color:var(--ink); font-family:var(--sans)}
+a{color:inherit; text-decoration:none}
+
+header{background:var(--navy); color:#fff; padding:calc(13px + env(safe-area-inset-top)) 18px 0; flex:none}
+.masthead{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+.bookbtn{background:none; border:0; padding:0; text-align:left; cursor:pointer; color:#fff; font:inherit; min-width:0}
+.bookbtn .sub{font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.55); white-space:nowrap}
+.bookbtn h1{font-family:var(--serif); font-size:21px; font-weight:600; margin:1px 0 0; white-space:nowrap}
+.bookbtn h1 .caret{font-size:11px; opacity:.6; margin-left:5px; vertical-align:2px}
+.bookbtn .sub2{font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:rgba(255,255,255,.72);
+  margin-top:3px; font-weight:600; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hbtns{display:flex; gap:7px; flex:none}
+.hbtn{background:none; border:1px solid rgba(255,255,255,.32); color:#fff; font:inherit;
+  font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:6px 10px;
+  border-radius:999px; cursor:pointer; transition:.18s; white-space:nowrap; display:inline-block}
+.hbtn:hover{background:rgba(255,255,255,.13)}
+.hbtn[hidden]{display:none}
+
+.sheet{position:fixed; inset:0; z-index:40; background:rgba(27,58,92,.55); display:none; align-items:flex-end; justify-content:center}
+.sheet.open{display:flex}
+.sheetbody{background:var(--base); width:100%; max-width:620px; max-height:88dvh; overflow-y:auto;
+  border-radius:16px 16px 0 0; padding:26px 24px calc(30px + env(safe-area-inset-bottom))}
+@media(min-width:700px){ .sheet{align-items:center} .sheetbody{border-radius:16px} }
+.sheetbody h3{font-family:var(--serif); font-size:24px; margin:6px 0 4px; font-weight:600}
+.kick{font-size:9.5px; letter-spacing:.19em; text-transform:uppercase; color:var(--muted); font-weight:600}
+.blist{list-style:none; margin:10px 0 0; padding:0}
+.brow{display:flex; gap:14px; align-items:center; width:100%; text-align:left; cursor:pointer;
+  border-top:1px solid var(--line); padding:13px 0; font:inherit}
+.brow .sw{display:flex; gap:3px; flex:none}
+.brow .sw i{width:11px; height:11px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.13)}
+.brow strong{display:block; font-family:var(--serif); font-size:17px; font-weight:600}
+.brow small{display:block; font-size:11px; color:var(--muted); margin-top:2px}
+.brow .go{margin-left:auto; color:var(--muted); font-size:16px}
+.brow.cur strong{color:var(--wk,var(--accent))}
+.dirlist{list-style:none; margin:16px 0 0; padding:0}
+.dirlist li{display:flex; gap:14px; padding:12px 0; border-top:1px solid var(--line)}
+.dirlist .num{font-family:var(--serif); font-size:15px; color:var(--wk,var(--accent)); width:22px; flex:none}
+.dirlist strong{display:block; font-size:12px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:4px}
+.dirlist p{margin:0; font-size:14px; line-height:1.5; color:var(--muted)}
+.pal{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+.pal div{width:30px; height:30px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.snote{font-size:13px; line-height:1.5; color:var(--muted); margin:18px 0 0}
+.closebtn{margin-top:24px; width:100%; padding:12px; border-radius:999px; cursor:pointer;
+  background:var(--navy); color:#fff; border:0; font:inherit; font-size:11px; letter-spacing:.14em; text-transform:uppercase}
+
+:focus-visible{outline:2px solid var(--wk,var(--accent)); outline-offset:3px}
+@media(prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+.fade{animation:fade .3s ease both}
+@keyframes fade{from{opacity:0; transform:translateY(7px)} to{opacity:1; transform:none}}
+
+body{height:100dvh; display:flex; flex-direction:column; overflow:hidden; overscroll-behavior:none}
+.weektabs{display:flex; gap:16px; justify-content:space-between; margin-top:13px; overflow-x:auto; scrollbar-width:none}
+.weektabs::-webkit-scrollbar{display:none}
+.weektab{background:none; border:0; padding:0 0 11px; cursor:pointer; white-space:nowrap; font:inherit;
+  font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.5); position:relative; transition:color .18s}
+.weektab[aria-selected="true"]{color:#fff}
+.weektab[aria-selected="true"]::after{content:""; position:absolute; left:0; right:0; bottom:0; height:2px; background:var(--wk,var(--accent))}
+
+.rail{display:flex; background:var(--card); border-bottom:1px solid var(--line); flex:none}
+.daybtn{flex:1; background:none; border:0; cursor:pointer; font:inherit; padding:9px 2px 8px;
+  display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--muted); position:relative; transition:color .18s}
+.daybtn .d{font-size:10px; letter-spacing:.14em; font-weight:600}
+.daybtn .n{font-family:var(--serif); font-size:17px; line-height:1.05; color:var(--ink); opacity:.55}
+.rail.nodate .daybtn{padding:12px 2px 11px}
+.rail.nodate .daybtn .d{font-size:13px; letter-spacing:.16em; font-family:var(--serif); font-weight:600}
+.daybtn.wknd .d{color:var(--wk,var(--accent))}
+.daybtn[aria-selected="true"]{color:var(--ink)}
+.daybtn[aria-selected="true"] .n{opacity:1}
+.daybtn[aria-selected="true"]::after{content:""; position:absolute; left:16%; right:16%; bottom:0; height:2px; background:var(--wk,var(--accent))}
+.daybtn.is-today{background:var(--paper)}
+.daybtn.is-today .d{color:var(--wk,var(--accent))}
+
+main{flex:1; min-height:0; display:flex; justify-content:center; padding:14px 16px 10px; overflow-y:auto}
+.spread{width:100%; max-width:1020px; min-height:0; display:grid; grid-template-rows:minmax(120px,1fr) auto; gap:14px}
+@media(min-width:820px){ .spread{grid-template-columns:1.02fr 1fr; grid-template-rows:minmax(0,1fr); gap:48px; align-items:center} }
+.figwrap{background:var(--card); border-radius:14px; padding:14px; display:flex; align-items:flex-end; justify-content:center; min-height:0; overflow:hidden}
+.figwrap img{width:auto; max-width:100%; max-height:100%; height:auto; object-fit:contain; display:block; filter:drop-shadow(0 16px 20px rgba(60,50,35,.14))}
+@media(max-width:819px){ .figwrap{max-height:41dvh; background:none; padding:4px 0 0} .pieces li:last-child{border-bottom:0} }
+@media(min-width:820px){ .figwrap{height:100%; padding:20px} }
+.detail{display:flex; flex-direction:column}
+.rule{width:52px; height:3px; background:var(--wk,var(--accent)); margin-bottom:13px}
+.detail .day{font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--wk,var(--accent)); font-weight:700}
+.detail h2{font-family:var(--serif); font-size:clamp(22px,5.4vw,34px); line-height:1.13; font-weight:600; margin:5px 0 0}
+.tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:9px}
+.tag{padding:3px 9px; border-radius:999px; border:1px solid var(--line); background:var(--paper);
+  font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600}
+.pieces{list-style:none; margin:14px 0 0; padding:0; border-top:1px solid var(--line)}
+.pieces li{display:flex; align-items:center; gap:13px; padding:8px 0; border-bottom:1px solid var(--line)}
+@media(min-width:820px){ .pieces li{padding:10px 0} }
+.chip{width:23px; height:23px; border-radius:50%; flex:none; box-shadow:inset 0 0 0 1px rgba(0,0,0,.16), 0 1px 2px rgba(0,0,0,.10)}
+.pieces .lbl{font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:600; width:86px; flex:none}
+.pieces .nm{font-size:14.5px; color:var(--ink)}
+
+.strip{display:flex; gap:6px; justify-content:center; align-items:flex-end; flex:none;
+  max-width:760px; margin:0 auto; width:100%; padding:8px 10px calc(9px + env(safe-area-inset-bottom));
+  background:var(--card); border-top:1px solid var(--line)}
+.thumb{background:none; border:0; padding:4px 2px 6px; cursor:pointer; flex:1; max-width:74px;
+  border-radius:8px; display:flex; flex-direction:column; align-items:center; gap:3px; opacity:.42; transition:opacity .2s, background .2s}
+.thumb img{height:44px; width:auto; max-width:100%; object-fit:contain; display:block}
+.thumb span{font-size:9px; letter-spacing:.12em; font-weight:600; color:var(--muted)}
+.thumb:hover{opacity:.8}
+.thumb[aria-selected="true"]{opacity:1; background:var(--paper)}
+.thumb[aria-selected="true"] span{color:var(--ink)}
+@media(min-width:820px){ .thumb img{height:74px} .thumb{max-width:96px} }
+
+.arrow{position:fixed; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:50%;
+  z-index:18; background:rgba(252,250,246,.88); border:1px solid var(--line); color:var(--navy);
+  font-size:16px; cursor:pointer; display:none; align-items:center; justify-content:center}
+@media(min-width:900px){ .arrow{display:flex} }
+.arrow.prev{left:18px} .arrow.next{right:18px}
+.arrow:hover{background:#fff}
+</style>
+</head><body>
+
+<header id="hdr">
+  <div class="masthead">
+    <button class="bookbtn" id="bookBtn">
+      <span class="sub">Guardarropa</span>
+      <h1>Beach Club<span class="caret">&#9662;</span></h1>
+      <span class="sub2">Mediterranean Resort</span>
+    </button>
+    <div class="hbtns">
+      <a class="hbtn" href="index.html">Galería</a>
+      <button class="hbtn" id="todayBtn" hidden>Hoy</button>
+    </div>
+  </div>
+  <div class="weektabs" id="weektabs" role="tablist"></div>
+</header>
+
+<nav class="rail" id="rail" role="tablist" aria-label="Días"></nav>
+<main id="stage"></main>
+<div class="strip" id="strip" role="tablist" aria-label="Outfits de la semana"></div>
+
+<button class="arrow prev" id="prev" aria-label="Anterior">&#8249;</button>
+<button class="arrow next" id="next" aria-label="Siguiente">&#8250;</button>
+<div class="sheet" id="sheet"><div class="sheetbody" id="sheetbody"></div></div>
+
+<script>
+const B = {"id":"bch","title":"Beach Club","subtitle":"Mediterranean Resort","kicker":"28 outfits · swim shorts · lino · guayaberas · rayas Breton","dated":false,"direction":[["Classic Mariner","Navy, blanco, rayas Breton, lino limpio y accesorios de yacht club."],["Italian Coast","Coral, limón, turquesa, terracota y oliva con una sensibilidad italiana."],["Swim Club","Trajes de baño cortos y lisos combinados con básicos, polos y overshirts."],["Resort Sunset","Guayaberas, lino y punto fino para pasar de la playa al aperitivo."]],"note":"28 looks de playa con shorts cortos, trajes de baño, lino, rayas marineras y guayaberas.","palette":[["Navy","#173A5E"],["Oliva","#5C6644"],["Petróleo","#276B78"],["Óxido","#C1622E"],["Taupe","#A49A8A"],["Granate","#7D2E40"]],"weeks":[{"label":"Sem 01","accent":"#5C6544","days":[{"dow":"Lunes","short":"L","weekend":false,"eyebrow":"Breton navy","title":"Playera marinera navy/blanco","intent":"Marinero clásico","items":[{"label":"Playera","name":"Playera marinera navy/blanco","color":"#22304C"},{"label":"Short","name":"Short navy corto","color":"#22304C"},{"label":"Gorra","name":"Gorra navy","color":"#22304C"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"},{"label":"Lentes","name":"Lentes oscuros","color":"#2A2A2C"}],"kind":"Deporte","fam":"Azul","img":"f-bch-00.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.2},{"dow":"Martes","short":"M","weekend":false,"eyebrow":"White linen swim","title":"Camisa blanca de lino abierta","intent":"Mañana de playa","items":[{"label":"Camisa","name":"Camisa blanca de lino abierta","color":"#FBFBF8"},{"label":"Playera","name":"Tank blanca","color":"#FBFBF8"},{"label":"Traje de baño","name":"Traje de baño navy corto","color":"#22304C"},{"label":"Espadrilles","name":"Espadrille blanco","color":"#FBFBF8"}],"kind":"Casual","fam":"Neutro","img":"f-bch-01.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.4},{"dow":"Miércoles","short":"X","weekend":false,"eyebrow":"Navy linen polo","title":"Polo navy de lino","intent":"Club de playa","items":[{"label":"Polo","name":"Polo navy de lino","color":"#22304C"},{"label":"Short","name":"Short crema corto","color":"#E8DFC9"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"},{"label":"Lentes","name":"Lentes oscuros","color":"#2A2A2C"}],"kind":"Deporte","fam":"Azul","img":"f-bch-02.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.8},{"dow":"Jueves","short":"J","weekend":false,"eyebrow":"Sky linen","title":"Camisa azul cielo de lino","intent":"Paseo costero","items":[{"label":"Camisa","name":"Camisa azul cielo de lino","color":"#8FB6D8"},{"label":"Short","name":"Short blanco corto","color":"#FBFBF8"},{"label":"Espadrilles","name":"Espadrille navy","color":"#22304C"}],"kind":"Deporte","fam":"Azul","img":"f-bch-03.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.8},{"dow":"Viernes","short":"V","weekend":false,"eyebrow":"Breton burgundy","title":"Playera marinera marfil/navy","intent":"Riviera vintage","items":[{"label":"Playera","name":"Playera marinera marfil/navy","color":"#22304C"},{"label":"Traje de baño","name":"Traje de baño borgoña corto","color":"#6B2733"},{"label":"Sombrero","name":"Panamá","color":"#E4D8B8"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Casual","fam":"Azul","img":"f-bch-04.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-3.8},{"dow":"Sábado","short":"S","weekend":true,"eyebrow":"White guayabera","title":"Guayabera blanca","intent":"Almuerzo junto al mar","items":[{"label":"Guayabera","name":"Guayabera blanca","color":"#FBFBF8"},{"label":"Short","name":"Short navy corto","color":"#22304C"},{"label":"Espadrilles","name":"Espadrille blanco","color":"#FBFBF8"},{"label":"Lentes","name":"Lentes oscuros","color":"#2A2A2C"}],"kind":"Deporte","fam":"Neutro","img":"f-bch-05.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.8},{"dow":"Domingo","short":"D","weekend":true,"eyebrow":"Navy basic","title":"Playera básica navy","intent":"Domingo relajado","items":[{"label":"Playera","name":"Playera básica navy","color":"#22304C"},{"label":"Short","name":"Short piedra corto","color":"#C6BFB2"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Deporte","fam":"Azul","img":"f-bch-06.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.2}]},{"label":"Sem 02","accent":"#1F6E80","days":[{"dow":"Lunes","short":"L","weekend":false,"eyebrow":"Coral camp shirt","title":"Camisa camp coral de lino","intent":"Costa italiana","items":[{"label":"Camisa","name":"Camisa camp coral de lino","color":"#E4674A"},{"label":"Short","name":"Short blanco corto","color":"#FBFBF8"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Deporte","fam":"Marrón","img":"f-bch-07.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.6},{"dow":"Martes","short":"M","weekend":false,"eyebrow":"Lemon linen","title":"Camisa limón de lino","intent":"Color solar","items":[{"label":"Camisa","name":"Camisa limón de lino","color":"#F0E27A"},{"label":"Traje de baño","name":"Traje de baño navy corto","color":"#22304C"},{"label":"Espadrilles","name":"Espadrille blanco","color":"#FBFBF8"}],"kind":"Casual","fam":"Marrón","img":"f-bch-08.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.4},{"dow":"Miércoles","short":"X","weekend":false,"eyebrow":"Turquoise polo","title":"Polo turquesa de lino","intent":"Mar mediterráneo","items":[{"label":"Polo","name":"Polo turquesa de lino","color":"#2BB3C0"},{"label":"Short","name":"Short crema corto","color":"#E8DFC9"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Deporte","fam":"Azul","img":"f-bch-09.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.8},{"dow":"Jueves","short":"J","weekend":false,"eyebrow":"Terracotta guayabera","title":"Guayabera terracota","intent":"Lujo artesanal","items":[{"label":"Guayabera","name":"Guayabera terracota","color":"#C1622E"},{"label":"Short","name":"Short blanco corto","color":"#FBFBF8"},{"label":"Loafers","name":"Loafer de suede café","color":"#7A5535"}],"kind":"Deporte","fam":"Marrón","img":"f-bch-10.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.6},{"dow":"Viernes","short":"V","weekend":false,"eyebrow":"Royal blue basic","title":"Playera básica azul real","intent":"Azul intenso","items":[{"label":"Playera","name":"Playera básica azul real","color":"#2447A8"},{"label":"Traje de baño","name":"Traje de baño blanco corto","color":"#FBFBF8"},{"label":"Espadrilles","name":"Espadrille navy","color":"#22304C"}],"kind":"Casual","fam":"Azul","img":"f-bch-11.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-3.8},{"dow":"Sábado","short":"S","weekend":true,"eyebrow":"Olive overshirt","title":"Camisa oliva de lino abierta","intent":"Tarde en la costa","items":[{"label":"Camisa","name":"Camisa oliva de lino abierta","color":"#55603F"},{"label":"Playera","name":"Playera marfil","color":"#EFE7D8"},{"label":"Short","name":"Short arena","color":"#D8CDBA"},{"label":"Sombrero","name":"Panamá","color":"#E4D8B8"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Deporte","fam":"Verde","img":"f-bch-12.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.8},{"dow":"Domingo","short":"D","weekend":true,"eyebrow":"Deep red polo","title":"Polo rojo profundo","intent":"Aperitivo italiano","items":[{"label":"Polo","name":"Polo rojo profundo","color":"#8E2231"},{"label":"Short","name":"Short navy corto","color":"#22304C"},{"label":"Espadrilles","name":"Espadrille blanco","color":"#FBFBF8"}],"kind":"Deporte","fam":"Marrón","img":"f-bch-13.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.2}]},{"label":"Sem 03","accent":"#B4552F","days":[{"dow":"Lunes","short":"L","weekend":false,"eyebrow":"Sky swim","title":"Traje de baño azul cielo corto","intent":"Piscina del hotel","items":[{"label":"Traje de baño","name":"Traje de baño azul cielo corto","color":"#8FB6D8"},{"label":"Playera","name":"Playera blanca lisa","color":"#FBFBF8"},{"label":"Espadrilles","name":"Espadrille blanco","color":"#FBFBF8"},{"label":"Lentes","name":"Lentes oscuros","color":"#2A2A2C"}],"kind":"Casual","fam":"Azul","img":"f-bch-14.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-3.8},{"dow":"Martes","short":"M","weekend":false,"eyebrow":"Olive swim","title":"Traje de baño oliva corto","intent":"Swim to lunch","items":[{"label":"Traje de baño","name":"Traje de baño oliva corto","color":"#55603F"},{"label":"Overshirt","name":"Overshirt marfil de lino","color":"#EFE7D8"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Casual","fam":"Verde","img":"f-bch-15.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-3.4},{"dow":"Miércoles","short":"X","weekend":false,"eyebrow":"Burgundy breton","title":"Traje de baño borgoña corto","intent":"Swim club náutico","items":[{"label":"Traje de baño","name":"Traje de baño borgoña corto","color":"#6B2733"},{"label":"Playera","name":"Playera marinera","color":"#22304C"},{"label":"Gorra","name":"Gorra navy","color":"#22304C"},{"label":"Sneakers","name":"Sneaker blanco","color":"#FBFBF8"}],"kind":"Casual","fam":"Marrón","img":"f-bch-16.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"neutro","when":"día","warmth":-3.8},{"dow":"Jueves","short":"J","weekend":false,"eyebrow":"Navy swim linen","title":"Traje de baño navy corto","intent":"Playa elegante","items":[{"label":"Traje de baño","name":"Traje de baño navy corto","color":"#22304C"},{"label":"Camisa","name":"Camisa azul cielo de lino","color":"#8FB6D8"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Casual","fam":"Azul","img":"f-bch-17.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.2},{"dow":"Viernes","short":"V","weekend":false,"eyebrow":"Orange swim","title":"Traje de baño naranja corto","intent":"Color deportivo","items":[{"label":"Traje de baño","name":"Traje de baño naranja corto","color":"#D2691E"},{"label":"Polo","name":"Polo blanco de lino","color":"#FBFBF8"},{"label":"Espadrilles","name":"Espadrille blanco","color":"#FBFBF8"}],"kind":"Casual","fam":"Marrón","img":"f-bch-18.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.4},{"dow":"Sábado","short":"S","weekend":true,"eyebrow":"Turquoise swim","title":"Traje de baño turquesa corto","intent":"Contraste acuático","items":[{"label":"Traje de baño","name":"Traje de baño turquesa corto","color":"#2BB3C0"},{"label":"Playera","name":"Playera básica navy","color":"#22304C"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Casual","fam":"Azul","img":"f-bch-19.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-3.8},{"dow":"Domingo","short":"D","weekend":true,"eyebrow":"Cream swim","title":"Traje de baño crema corto","intent":"Domingo tropical","items":[{"label":"Traje de baño","name":"Traje de baño crema corto","color":"#E8DFC9"},{"label":"Guayabera","name":"Guayabera blanca abierta","color":"#FBFBF8"},{"label":"Sombrero","name":"Panamá","color":"#E4D8B8"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Casual","fam":"Neutro","img":"f-bch-20.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.2}]},{"label":"Sem 04","accent":"#A08C77","days":[{"dow":"Lunes","short":"L","weekend":false,"eyebrow":"Guayabera tobacco","title":"Guayabera blanca","intent":"Comida de resort","items":[{"label":"Guayabera","name":"Guayabera blanca","color":"#FBFBF8"},{"label":"Short","name":"Short tabaco corto","color":"#8A5A2B"},{"label":"Loafers","name":"Loafer de suede café","color":"#7A5535"}],"kind":"Deporte","fam":"Neutro","img":"f-bch-21.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.6},{"dow":"Martes","short":"M","weekend":false,"eyebrow":"Navy linen evening","title":"Camisa navy de lino","intent":"Aperitivo marino","items":[{"label":"Camisa","name":"Camisa navy de lino","color":"#22304C"},{"label":"Short","name":"Short blanco corto","color":"#FBFBF8"},{"label":"Espadrilles","name":"Espadrille navy","color":"#22304C"}],"kind":"Deporte","fam":"Azul","img":"f-bch-22.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.8},{"dow":"Miércoles","short":"X","weekend":false,"eyebrow":"Pink linen","title":"Camisa rosa claro de lino","intent":"Atardecer suave","items":[{"label":"Camisa","name":"Camisa rosa claro de lino","color":"#E9B7B7"},{"label":"Short","name":"Short crema corto","color":"#E8DFC9"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Deporte","fam":"Marrón","img":"f-bch-23.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.6},{"dow":"Jueves","short":"J","weekend":false,"eyebrow":"Ivory knit","title":"Polo de punto marfil","intent":"Resort refinado","items":[{"label":"Polo","name":"Polo de punto marfil","color":"#EFE7D8"},{"label":"Short","name":"Short chocolate corto","color":"#4A2F20"},{"label":"Loafers","name":"Loafer café","color":"#5A3A22"}],"kind":"Deporte","fam":"Neutro","img":"f-bch-24.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-3.2},{"dow":"Viernes","short":"V","weekend":false,"eyebrow":"Sky guayabera","title":"Guayabera azul cielo","intent":"Cena temprana","items":[{"label":"Guayabera","name":"Guayabera azul cielo","color":"#8FB6D8"},{"label":"Short","name":"Short blanco corto","color":"#FBFBF8"},{"label":"Espadrilles","name":"Espadrille blanco","color":"#FBFBF8"}],"kind":"Deporte","fam":"Azul","img":"f-bch-25.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.8},{"dow":"Sábado","short":"S","weekend":true,"eyebrow":"Terracotta sunset","title":"Camisa terracota de lino","intent":"Puesta de sol","items":[{"label":"Camisa","name":"Camisa terracota de lino","color":"#C1622E"},{"label":"Short","name":"Short arena","color":"#D8CDBA"},{"label":"Sombrero","name":"Panamá","color":"#E4D8B8"},{"label":"Sandalias","name":"Sandalia café","color":"#5A3A22"}],"kind":"Deporte","fam":"Marrón","img":"f-bch-26.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-4.6},{"dow":"Domingo","short":"D","weekend":true,"eyebrow":"Breton overshirt","title":"Overshirt navy de lino","intent":"Cierre náutico","items":[{"label":"Overshirt","name":"Overshirt navy de lino","color":"#22304C"},{"label":"Playera","name":"Playera marinera","color":"#22304C"},{"label":"Short","name":"Short blanco","color":"#FBFBF8"},{"label":"Espadrilles","name":"Espadrille navy","color":"#22304C"}],"kind":"Deporte","fam":"Azul","img":"f-bch-27.webp","date":null,"mon":null,"iso":null,"tmin":23,"tmax":40,"rain":"evitar","when":"día","warmth":-5.0}]}],"file":"beach-club.html","months":[6,7,8,9],"role":"temporada"}, NAV = [{"file":"agosto.html","title":"Agosto 2026","subtitle":"Sastrería italiana","palette":["#1B3A5C","#8A8A8C","#8A6242","#55603F","#D8CDBA","#8E2231"]},{"file":"septiembre.html","title":"Septiembre 2026","subtitle":"Pre-fall en México","palette":["#1B3A5C","#5C6544","#1F6E80","#B4552F","#A08C77","#6B2733"]},{"file":"winter.html","title":"Winter","subtitle":"The Peacoat Edit","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"active.html","title":"Active","subtitle":"Luxury Sportswear","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"autumn.html","title":"Autumn / Winter","subtitle":"Textured Separates","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"bodas.html","title":"Bodas","subtitle":"Tuxedo y traje formal","palette":["#5C6B47","#2B7F95","#C1622F","#9D9483","#12314E","#F2ECE5"]},{"file":"separates.html","title":"Separates","subtitle":"The Sport Coat Edit","palette":["#173A5E","#9D9483","#2B7F95","#7D2F42","#12314E","#F2ECE5"]},{"file":"primavera-verano.html","title":"Spring / Summer","subtitle":"Lightweight Separates","palette":["#173A5E","#9D9483","#2B7F95","#7D2F42","#12314E","#F2ECE5"]},{"file":"octubre.html","title":"Octubre 2026","subtitle":"Pre-fall en México","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"golf.html","title":"Golf","subtitle":"The RLX-Inspired Round","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"aspen.html","title":"Aspen · Vail","subtitle":"A Month in the Snow","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"loropiana.html","title":"Loro Piana","subtitle":"Traveller & Suede Bombers","palette":["#18354F","#5B6245","#276071","#A65F3F","#9A8873","#743A42"]},{"file":"pini-parma.html","title":"Pini Parma","subtitle":"Pre-Fall / Winter 2026","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"playa.html","title":"Playa","subtitle":"Resort y beachwear","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"purple-label.html","title":"Purple Label","subtitle":"Pre-Fall 2026","palette":["#173a5e","#c1622e","#5c6644","#7d2e40","#12314E","#F2ECE5"]},{"file":"safari.html","title":"Safari Capsule","subtitle":"Purple Label · expedition luxury","palette":["#173a5e","#c1622e","#5c6644","#7d2e40","#12314E","#F2ECE5"]},{"file":"yacht.html","title":"Yacht Collection","subtitle":"Purple Label · navy y blanco","palette":["#173a5e","#c1622e","#5c6644","#7d2e40","#12314E","#F2ECE5"]},{"file":"chromatic.html","title":"Chromatic","subtitle":"Colour Tailoring","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"savile-row.html","title":"Savile Row","subtitle":"The Banker's Wardrobe","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"riviera.html","title":"Riviera","subtitle":"Summer Tailoring","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]},{"file":"beach-club.html","title":"Beach Club","subtitle":"Mediterranean Resort","palette":["#173A5E","#5C6644","#276B78","#C1622E","#A49A8A","#7D2E40"]}];
+let wi = 0, di = 0;
+const $ = s => document.querySelector(s);
+const rail=$('#rail'), strip=$('#strip'), stage=$('#stage'), tabs=$('#weektabs'), sheet=$('#sheet');
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+let TODAY = null;
+(function(){
+  const iso = new Date().toISOString().slice(0,10);
+  B.weeks.forEach((w,x) => w.days.forEach((d,y) => { if(d.iso === iso) TODAY = [x,y]; }));
+})();
+
+(function(){
+  const m = /^#w(\d+)d(\d+)$/.exec(location.hash);
+  if(m){ wi = Math.min(+m[1], B.weeks.length-1); di = Math.min(+m[2], B.weeks[wi].days.length-1); }
+  else if(TODAY){ wi = TODAY[0]; di = TODAY[1]; }
+})();
+
+function render(animate){
+  const w = B.weeks[wi], d = w.days[di];
+  document.documentElement.style.setProperty('--wk', w.accent);
+
+  tabs.innerHTML = B.weeks.map((x,i) =>
+    '<button class="weektab" role="tab" data-w="'+i+'" aria-selected="'+(i===wi)+'">'+esc(x.label)+'</button>').join('');
+
+  rail.className = 'rail' + (B.dated ? '' : ' nodate');
+  rail.innerHTML = w.days.map((x,i) =>
+    '<button class="daybtn '+(x.weekend?'wknd':'')+' '+((TODAY&&TODAY[0]===wi&&TODAY[1]===i)?'is-today':'')+'"'
+    +' role="tab" data-d="'+i+'" aria-selected="'+(i===di)+'">'
+    +'<span class="d">'+x.short+'</span>'+(B.dated?'<span class="n">'+x.date+'</span>':'')+'</button>').join('');
+
+  strip.innerHTML = w.days.map((x,i) =>
+    '<button class="thumb" role="tab" data-d="'+i+'" aria-selected="'+(i===di)+'" title="'+esc(x.dow+' · '+x.title)+'">'
+    +'<img src="'+x.img+'" alt=""><span>'+x.short+'</span></button>').join('');
+
+  const line = B.dated ? d.dow+' '+d.date+' de '+d.mon+' · '+d.eyebrow
+                       : w.label+' · '+d.dow+' · '+d.eyebrow;
+  const tags = [];
+  if(d.repeat) tags.push('Repetición');
+  if(d.intent) tags.push(d.intent);
+  tags.push(d.kind, d.fam);
+
+  stage.innerHTML = '<div class="spread">'
+    + '<div class="figwrap"><img src="'+d.img+'" alt="'+esc(d.title)+'"></div>'
+    + '<div class="detail"><div class="rule"></div>'
+    + '<div class="day">'+esc(line)+'</div><h2>'+esc(d.title)+'</h2>'
+    + '<div class="tags">'+tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'</div>'
+    + '<ul class="pieces">'
+    + d.items.map(it => '<li><span class="chip" style="background:'+it.color+'"></span>'
+        +'<span class="lbl">'+esc(it.label)+'</span><span class="nm">'+esc(it.name)+'</span></li>').join('')
+    + '</ul></div></div>';
+  if(animate !== false) stage.firstElementChild.classList.add('fade');
+  $('#todayBtn').hidden = !TODAY || (TODAY[0]===wi && TODAY[1]===di);
+  history.replaceState(null, '', '#w'+wi+'d'+di);
+}
+
+function toFlat(){ let n=0; for(let i=0;i<wi;i++) n+=B.weeks[i].days.length; return n+di; }
+function go(step){
+  let t=0; for(const w of B.weeks) t+=w.days.length;
+  let n = Math.max(0, Math.min(t-1, toFlat()+step));
+  for(let w=0;w<B.weeks.length;w++){
+    if(n < B.weeks[w].days.length){ wi=w; di=n; break; }
+    n -= B.weeks[w].days.length;
+  }
+  render();
+}
+tabs.addEventListener('click', e => { const t=e.target.closest('.weektab'); if(!t) return; wi=+t.dataset.w; di=0; render(); });
+rail.addEventListener('click', e => { const t=e.target.closest('.daybtn'); if(!t) return; di=+t.dataset.d; render(); });
+strip.addEventListener('click', e => { const t=e.target.closest('.thumb'); if(!t) return; di=+t.dataset.d; render(); });
+$('#prev').onclick = () => go(-1);
+$('#next').onclick = () => go(1);
+$('#todayBtn').onclick = () => { if(TODAY){ wi=TODAY[0]; di=TODAY[1]; render(); } };
+addEventListener('keydown', e => {
+  if(sheet.classList.contains('open')){ if(e.key==='Escape') sheet.classList.remove('open'); return; }
+  if(e.key==='ArrowRight') go(1);
+  if(e.key==='ArrowLeft') go(-1);
+});
+let x0=null,y0=null;
+stage.addEventListener('touchstart', e => { x0=e.touches[0].clientX; y0=e.touches[0].clientY; }, {passive:true});
+stage.addEventListener('touchend', e => {
+  if(x0===null) return;
+  const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+  if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)) go(dx<0?1:-1);
+  x0=null;
+}, {passive:true});
+
+sheet.addEventListener('click', e => {
+  if(e.target.id==='sheet' || e.target.hasAttribute('data-close')) sheet.classList.remove('open');
+});
+$('#bookBtn').onclick = () => {
+  let h = '<div class="kick">'+esc(B.title)+'</div><h3>'+esc(B.subtitle)+'</h3>'
+        + '<div class="snote" style="margin-top:6px">'+esc(B.kicker)+'</div>';
+  if(B.direction.length)
+    h += '<ul class="dirlist">' + B.direction.map((p,i) =>
+      '<li><span class="num">0'+(i+1)+'</span><div><strong>'+esc(p[0])+'</strong><p>'+esc(p[1])+'</p></div></li>').join('') + '</ul>';
+  h += '<div class="kick" style="margin-top:18px">Paleta</div><div class="pal">'
+     + B.palette.map(c=>'<div style="background:'+c[1]+'"></div>').join('') + '</div>';
+  if(B.note) h += '<p class="snote">'+esc(B.note)+'</p>';
+  h += '<div class="kick" style="margin-top:26px">Booklets</div><ul class="blist">'
+     + NAV.map(x => '<a class="brow '+(x.file===B.file?'cur':'')+'" href="'+x.file+'">'
+        + '<span class="sw">'+x.palette.slice(0,4).map(c=>'<i style="background:'+c+'"></i>').join('')+'</span>'
+        + '<span><strong>'+esc(x.title)+'</strong><small>'+esc(x.subtitle)+'</small></span>'
+        + '<span class="go">&#8250;</span></a>').join('')
+     + '</ul><a class="brow" href="index.html" style="border-bottom:1px solid var(--line)">'
+     + '<span><strong>Galería</strong><small>Los 140 outfits juntos</small></span><span class="go">&#8250;</span></a>';
+  $('#sheetbody').innerHTML = h + '<button class="closebtn" data-close>Cerrar</button>';
+  sheet.classList.add('open');
+};
+addEventListener('hashchange', () => {
+  const m = /^#w(\d+)d(\d+)$/.exec(location.hash);
+  if(m){ wi=+m[1]; di=+m[2]; render(); }
+});
+render(false);
+</script></body></html>
